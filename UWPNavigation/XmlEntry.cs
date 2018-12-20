@@ -15,7 +15,7 @@ namespace UWPNavigation
         int x, y, width, height;
         int SpriteIndex;
         string Name;
-        public XmlEntry(int x, int y, Canvas canvas, WriteableBitmap bimg, string name)
+        public XmlEntry(int x, int y, Canvas canvas, BitmapImage bimg, string name)
         {
             this.Name = name;
             this.x = x;

@@ -117,33 +117,33 @@ namespace UWPNavigation
                         int.TryParse(reader.GetAttribute("y"), out y);
                         string name = reader.GetAttribute("name");
 
-                        WriteableBitmap wbmp = await BitmapFactory.FromStream(stream);
-                        
-                        WriteableBitmap cropped = wbmp.Clone().Crop(x,y,width, height);
+                        //WriteableBitmap wbmp = await BitmapFactory.FromStream(stream);
 
-                        XmlEntry xmle = new XmlEntry(x, y, canvas, cropped, name);
-                        xmlEntries.Add(xmle);
+                        //WriteableBitmap cropped = wbmp.Clone().Crop(x,y,width, height);
 
-                        //BitmapBounds bounds = new BitmapBounds();
-                        //bounds.X = (uint)x;
-                        //bounds.Y = (uint)y;
-                        //bounds.Width = (uint)width;
-                        //bounds.Height = (uint)height;
-
-                        //BitmapDecoder decoder = await BitmapDecoder.CreateAsync(stream);
-
-                        //InMemoryRandomAccessStream ras = new InMemoryRandomAccessStream();
-                        //BitmapEncoder enc = await BitmapEncoder.CreateForTranscodingAsync(ras, decoder);
-
-                        //enc.BitmapTransform.Bounds = bounds;
-
-                        //await enc.FlushAsync();
-
-                        //WriteableBitmap tmpbimg = new WriteableBitmap(0, 0);
-                        //tmpbimg.SetSource(ras);
-
-                        //XmlEntry xmle = new XmlEntry(x, y, canvas, tmpbimg, name);
+                        //XmlEntry xmle = new XmlEntry(x, y, canvas, cropped, name);
                         //xmlEntries.Add(xmle);
+
+                        BitmapBounds bounds = new BitmapBounds();
+                        bounds.X = (uint)x;
+                        bounds.Y = (uint)y;
+                        bounds.Width = (uint)width;
+                        bounds.Height = (uint)height;
+
+                        BitmapDecoder decoder = await BitmapDecoder.CreateAsync(stream);
+
+                        InMemoryRandomAccessStream ras = new InMemoryRandomAccessStream();
+                        BitmapEncoder enc = await BitmapEncoder.CreateForTranscodingAsync(ras, decoder);
+
+                        enc.BitmapTransform.Bounds = bounds;
+
+                        await enc.FlushAsync();
+
+                        BitmapImage tmpbimg = new BitmapImage();
+                        tmpbimg.SetSource(ras);
+
+                        XmlEntry xmle = new XmlEntry(x, y, canvas, tmpbimg, name);
+                        xmlEntries.Add(xmle);
                         break;
                     case "TextureAtlas":
                         if (reader.HasAttributes)
@@ -160,10 +160,9 @@ namespace UWPNavigation
             Windows.Storage.StorageFile file = await ImagePicker.PickSingleFileAsync();
             if (file == null)
                 return;
-            //WriteableBitmap bimg = new WriteableBitmap(1, 1).FromStream(tmp);
+            BitmapImage bimg = new BitmapImage();
             var tmpstream = await file.OpenReadAsync();
-            WriteableBitmap bimg = await BitmapFactory.FromStream(tmpstream);
-            //await bimg.SetSourceAsync(tmpstream);
+            await bimg.SetSourceAsync(tmpstream);
 
             XmlEntry xmle = new XmlEntry(0, 0, canvas, bimg, file.Name);
             xmlEntries.Add(xmle);

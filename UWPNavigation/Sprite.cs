@@ -19,7 +19,8 @@ namespace UWPNavigation
         static int DragComponentIndex;
         static bool DragComponent;
         static double scale = 1;
-        static int Xscroll, Yscroll = 0;
+        static int Xscroll = 0;
+        static int Yscroll = 0;
 
         public static double SnapInterval { get; set; } = 1;
 
@@ -45,7 +46,7 @@ namespace UWPNavigation
 
             ((Image)canvas.Children[index]).Width = width * factor;
         }
-        public void setSource(WriteableBitmap bimg)
+        public void setSource(BitmapImage bimg)
         {
             this.height = bimg.PixelHeight;
             this.width = bimg.PixelWidth;
@@ -81,12 +82,14 @@ namespace UWPNavigation
             if (scale < 1)
                 scale = 1;
             if (DragComponent)
+            {
                 x = ((e.GetCurrentPoint(canvas).Position.X));
                 y = ((e.GetCurrentPoint(canvas).Position.Y));
-                x = (x - (x%(SnapInterval * scale)) + Xscroll) /scale;
-                y = (y - (y%(SnapInterval * scale)) + Yscroll) /scale;
-                canvas.Children[DragComponentIndex].SetValue(Canvas.TopProperty, y*scale);
-                canvas.Children[DragComponentIndex].SetValue(Canvas.LeftProperty, x*scale);
+                x = (x - (x % (SnapInterval * scale)) + Xscroll) / scale;
+                y = (y - (y % (SnapInterval * scale)) + Yscroll) / scale;
+                canvas.Children[DragComponentIndex].SetValue(Canvas.TopProperty, y * scale);
+                canvas.Children[DragComponentIndex].SetValue(Canvas.LeftProperty, x * scale);
+            }
         }
     }
 }
