@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Graphics.Display;
 using Windows.Graphics.Imaging;
 using Windows.Storage.Streams;
 using Windows.UI.Xaml;
@@ -183,23 +184,35 @@ namespace UWPNavigation
             stream.SetLength(0);
             xmlDoc.Save(stream);
             await stream.FlushAsync();
+            SaveImageAtlas();
         }
         private async void SaveImageAtlas()
         {
-            //var file = await ImagePicker.PickSingleFileAsync();
-            //var stream = await file.OpenStreamForWriteAsync();
-
-            //BitmapImage bimg = new BitmapImage();
-
-            //InMemoryRandomAccessStream randomAccessStream = new InMemoryRandomAccessStream();
-            //randomAccessStream.
-            
             WriteableBitmap wbmp = new WriteableBitmap((int)XmlEntry.getWidth(), (int)XmlEntry.getHeight());
-            
+            canvas.Width = wbmp.PixelWidth;
+            canvas.Height = wbmp.PixelHeight;
+            RenderTargetBitmap renderTargetBitmap = new RenderTargetBitmap();
+            await renderTargetBitmap.RenderAsync(canvas);
+            Atlas.Source = renderTargetBitmap;
+            canvas.SetValue(WidthProperty, 1000);
+            canvas.Height = 1000;
 
-            //BitmapDecoder decoder = 
-            //BitmapEncoder encoder = await BitmapEncoder.CreateForTranscodingAsync(stream);
+            IBuffer pixelBuffer = await renderTargetBitmap.GetPixelsAsync();
+            byte[] pixels = pixelBuffer.ToArray();
 
+            DisplayInformation displayInformation = DisplayInformation.GetForCurrentView();
+
+            var file = await ImagePicker.PickSingleFileAsync();
+            var stream = await file.OpenAsync(Windows.Storage.FileAccessMode.ReadWrite);
+            BitmapEncoder encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, stream);
+            encoder.SetPixelData(BitmapPixelFormat.Bgra8, // RGB with alpha
+                                 BitmapAlphaMode.Premultiplied,
+                                 (uint)renderTargetBitmap.PixelWidth,
+                                 (uint)renderTargetBitmap.PixelHeight,
+                                 displayInformation.RawDpiX,
+                                 displayInformation.RawDpiY,
+                                 pixels);
+            await encoder.FlushAsync();
         }
     }
 }

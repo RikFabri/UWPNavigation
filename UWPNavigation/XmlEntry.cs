@@ -33,10 +33,10 @@ namespace UWPNavigation
             XmlElement root = rootElement;
             XmlElement tex = xmlDoc.CreateElement("SubTexture");
             tex.SetAttribute("name", Name);
-            tex.SetAttribute("x", x.ToString());
-            tex.SetAttribute("y", y.ToString());
-            tex.SetAttribute("width", width.ToString());
-            tex.SetAttribute("height", height.ToString());
+            tex.SetAttribute("x", sprites[SpriteIndex].x.ToString());
+            tex.SetAttribute("y", sprites[SpriteIndex].y.ToString());
+            tex.SetAttribute("width", sprites[SpriteIndex].width.ToString());
+            tex.SetAttribute("height", sprites[SpriteIndex].height.ToString());
             root.AppendChild(tex);
         }
         public static double getHeight()
